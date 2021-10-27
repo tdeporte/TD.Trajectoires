@@ -3,6 +3,7 @@
 import argparse
 import pandas as pd
 import plotly.express as px
+import plotly
 
 parser = argparse.ArgumentParser()
 parser.add_argument("inputs", nargs='*',
@@ -24,8 +25,7 @@ for path in args.inputs:
     else:
         df = pd.concat([df, tmp_df])
 
-fig = px.scatter(df, x="t", y="value", color="source",
-                 facet_row="order", facet_col="variable")
+fig = px.scatter(df, x="t", y="value", color="source",facet_row="order", facet_col="variable")
 fig.update_traces(marker_size=3)
 fig.for_each_annotation(lambda a: a.update(text=a.text.split("=")[1]))
 fig.update_layout(font=dict(size=14))

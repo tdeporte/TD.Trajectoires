@@ -118,13 +118,17 @@ class Spline(Trajectory):
 
     def __init__(self, knots, start=0):
         super().__init__(start)
-        raise NotImplementedError()
+        self.knots = knots
+        self.start = knots[int(start),1]
+        self.end = knots[-1,1]
+        self.coeffs = np.ndarray((np.shape(knots)[0],4))
 
     @abstractmethod
     def updatePolynomials(self):
         """
         Updates the polynomials based on the knots and the interpolation method
         """
+
 
     def getDegree(self):
         """
@@ -133,7 +137,7 @@ class Spline(Trajectory):
         d : int
             The degree of the polynomials used in this spline
         """
-        raise NotImplementedError()
+        return len(self.coeffs)
 
     def getPolynomial(self, t):
         """
@@ -149,15 +153,28 @@ class Spline(Trajectory):
         p : np.ndarray shape(k+1,)
             The coefficients of the polynomial at time t, see coeffs
         """
-        raise NotImplementedError()
+        adjusted_t = t - self.start
+        p = self.coeffs
+        return adjusted_t, p
+
 
     def getVal(self, t, d=0):
-        raise NotImplementedError()
+        #S_i(t) = sum_{j=0}^{k}coeffs[i,j] * (t-t_i)^(k-j)
+        adj_t, p = self.getPolynomial(t)
+        pdegree = self.getDegree()
+
+        sum = 0
+        if(d==1):
+            for i in range(pdegree): 
+                sum += p[i]*t**(pdegree - i) 
+
+        return sum
 
 
 class ConstantSpline(Spline):
     def updatePolynomials(self):
-        raise NotImplementedError()
+        for i in len(knots):
+            self.coeff[i,0] = knots[i][1]
 
 
 class LinearSpline(Spline):
